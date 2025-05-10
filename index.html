@@ -1,0 +1,790 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>About Us | AI Companions India</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.11.4/dist/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.11.4/ScrollTrigger.min.js"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap');
+    
+    :root {
+      --glass-bg: rgba(255, 255, 255, 0.15);
+      --glass-border: rgba(255, 255, 255, 0.18);
+      --glass-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+      --glass-blur: blur(12px);
+      --neon-pink: #ff3fa4;
+      --neon-blue: #00b8ff;
+      --neon-purple: #8a2be2;
+      --desi-orange: #ff6b35;
+    }
+    
+    body {
+      font-family: 'Poppins', -apple-system, BlinkMacSystemFont, sans-serif;
+      background-color: #000;
+      color: white;
+      overflow-x: hidden;
+      cursor: none;
+    }
+    
+    .glass-card {
+      background: var(--glass-bg);
+      backdrop-filter: var(--glass-blur);
+      -webkit-backdrop-filter: var(--glass-blur);
+      border-radius: 16px;
+      border: 1px solid var(--glass-border);
+      box-shadow: var(--glass-shadow);
+      transition: all 0.3s ease;
+    }
+    
+    .glass-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+    }
+    
+    .hero-gradient {
+      background: linear-gradient(135deg, var(--neon-purple) 0%, var(--neon-pink) 50%, var(--desi-orange) 100%);
+    }
+    
+    .door {
+      position: fixed;
+      top: 0;
+      width: 50vw;
+      height: 100vh;
+      background: linear-gradient(45deg, #111, #222);
+      z-index: 100;
+      transform-origin: left center;
+      transition: transform 1.2s cubic-bezier(0.65, 0, 0.35, 1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+    
+    .left-door {
+      left: 0;
+      transform: perspective(1200px) rotateY(0deg);
+      background: linear-gradient(45deg, #111, #8a2be2);
+    }
+    
+    .right-door {
+      right: 0;
+      transform-origin: right center;
+      transform: perspective(1200px) rotateY(0deg);
+      background: linear-gradient(45deg, #ff3fa4, #111);
+    }
+    
+    .doors-open .left-door {
+      transform: perspective(1200px) rotateY(-110deg);
+    }
+    
+    .doors-open .right-door {
+      transform: perspective(1200px) rotateY(110deg);
+    }
+    
+    .door-content {
+      padding: 2rem;
+      opacity: 1;
+      transition: opacity 0.5s ease;
+      text-align: center;
+    }
+    
+    .doors-open .door-content {
+      opacity: 1;
+    }
+    
+    .scroll-hint {
+      position: absolute;
+      bottom: 30px;
+      left: 50%;
+      transform: translateX(-50%);
+      animation: bounce 2s infinite;
+    }
+    
+    @keyframes bounce {
+      0%, 20%, 50%, 80%, 100% {transform: translateY(0) translateX(-50%);}
+      40% {transform: translateY(-20px) translateX(-50%);}
+      60% {transform: translateY(-10px) translateX(-50%);}
+    }
+    
+    .floating {
+      animation: floating 6s ease-in-out infinite;
+    }
+    
+    @keyframes floating {
+      0% { transform: translateY(0px); }
+      50% { transform: translateY(-20px); }
+      100% { transform: translateY(0px); }
+    }
+    
+    .text-gradient {
+      background: linear-gradient(90deg, var(--neon-pink) 0%, var(--neon-blue) 50%, var(--neon-purple) 100%);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+    
+    .glow {
+      filter: drop-shadow(0 0 8px rgba(255,255,255,0.6));
+    }
+    
+    .model-card {
+      transition: all 0.3s ease;
+      transform-style: preserve-3d;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .model-card:hover {
+      transform: translateY(-10px) scale(1.02);
+      box-shadow: 0 25px 50px rgba(0,0,0,0.3);
+    }
+    
+    .model-img-container {
+      position: relative;
+      overflow: hidden;
+      border-radius: 16px 16px 0 0;
+    }
+    
+    .model-img {
+      transition: transform 0.5s ease;
+    }
+    
+    .model-card:hover .model-img {
+      transform: scale(1.05);
+    }
+    
+    .model-badge {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background: rgba(0,0,0,0.7);
+      color: white;
+      padding: 5px 10px;
+      border-radius: 20px;
+      font-size: 12px;
+      z-index: 2;
+    }
+    
+    .custom-cursor {
+      position: fixed;
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      background: white;
+      mix-blend-mode: difference;
+      pointer-events: none;
+      z-index: 9999;
+      transform: translate(-50%, -50%);
+      transition: transform 0.2s ease;
+    }
+    
+    .cursor-scale {
+      transform: translate(-50%, -50%) scale(2);
+    }
+    
+    .hover-scale {
+      transition: transform 0.3s ease;
+    }
+    
+    .hover-scale:hover {
+      transform: scale(1.1);
+    }
+    
+    #ai-models {
+      scroll-behavior: smooth;
+    }
+    
+    .neon-text {
+      text-shadow: 0 0 10px var(--neon-pink), 0 0 20px var(--neon-pink), 0 0 30px var(--neon-purple);
+    }
+    
+    .desi-gradient {
+      background: linear-gradient(90deg, #ff6b35 0%, #ffbe0b 50%, #8338ec 100%);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+    
+    .hindi-text {
+      font-family: 'Poppins', 'Noto Sans Devanagari', sans-serif;
+    }
+    
+    .emoji-float {
+      animation: emojiFloat 5s ease-in-out infinite;
+    }
+    
+    @keyframes emojiFloat {
+      0%, 100% { transform: translateY(0) rotate(0deg); }
+      25% { transform: translateY(-20px) rotate(5deg); }
+      50% { transform: translateY(0px) rotate(0deg); }
+      75% { transform: translateY(-10px) rotate(-5deg); }
+    }
+    
+    .chat-bubble {
+      position: relative;
+      background: rgba(255,255,255,0.1);
+      border-radius: 20px;
+      padding: 15px;
+      margin: 10px 0;
+      max-width: 80%;
+    }
+    
+    .chat-bubble:after {
+      content: '';
+      position: absolute;
+      bottom: -10px;
+      left: 20px;
+      border-width: 10px 10px 0;
+      border-style: solid;
+      border-color: rgba(255,255,255,0.1) transparent;
+    }
+    .object-cover {
+    object-fit: cover;
+    object-position: center 30%;
+}
+    .ticker-tape {
+      display: flex;
+      overflow: hidden;
+      white-space: nowrap;
+      background: linear-gradient(90deg, var(--neon-purple), var(--neon-pink));
+      padding: 15px 0;
+    }
+    
+    .ticker-item {
+      display: inline-flex;
+      align-items: center;
+      margin-right: 40px;
+      font-size: 18px;
+      font-weight: 600;
+    }
+    
+    .ticker-emoji {
+      margin-right: 10px;
+      font-size: 24px;
+    }
+    
+    .hindi-switch {
+      position: fixed;
+      bottom: 30px;
+      right: 30px;
+      z-index: 1000;
+      background: rgba(255,255,255,0.2);
+      border-radius: 50px;
+      padding: 10px 15px;
+      cursor: pointer;
+      backdrop-filter: blur(10px);
+      display: flex;
+      align-items: center;
+      transition: all 0.3s ease;
+    }
+    
+    .hindi-switch:hover {
+      background: rgba(255,255,255,0.3);
+      transform: scale(1.05);
+    }
+    
+    .hindi-active {
+      background: rgba(255,255,255,0.4);
+    }
+    
+    .bollywood-bg {
+      background: url('https://images.unsplash.com/photo-1567593810079-4c1e5d1d5d9a?auto=format&fit=crop&w=1350&q=80') no-repeat center center;
+      background-size: cover;
+      position: relative;
+    }
+    
+    .bollywood-bg:before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(45deg, rgba(138,43,226,0.7), rgba(255,63,164,0.7));
+    }
+    
+    .testimonial-card {
+      border-left: 4px solid var(--neon-pink);
+    }
+    
+    .marquee {
+      position: relative;
+      width: 100vw;
+      max-width: 100%;
+      height: 80px;
+      overflow-x: hidden;
+    }
+    
+    .marquee-content {
+      display: flex;
+      position: absolute;
+      animation: marquee 30s linear infinite;
+    }
+    
+    @keyframes marquee {
+      0% { transform: translateX(0); }
+      100% { transform: translateX(-50%); }
+    }
+    
+    .marquee-item {
+      display: flex;
+      align-items: center;
+      margin-right: 40px;
+      font-size: 24px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+    
+    .marquee-emoji {
+      margin-right: 15px;
+      font-size: 28px;
+    }
+  </style>
+</head>
+<body>
+  <div class="custom-cursor"></div>
+  
+  <!-- Language Switch -->
+  <div class="hindi-switch" id="languageSwitch">
+    <span class="mr-2">🇮🇳</span>
+    <span id="languageText">हिंदी</span>
+  </div>
+  
+  <!-- Doors -->
+  <div class="door left-door">
+    <div class="door-content">
+      <h2 class="text-4xl font-bold mb-4 neon-text">Welcome to</h2>
+      <div class="text-6xl font-bold text-gradient mb-6">AI Companions</div>
+      <p class="text-xl opacity-80">Tech that speaks your language <span class="emoji-float">🇮🇳</span></p>
+      <div class="mt-8">
+        <div class="chat-bubble">"Kya haal hai?" - Your AI will ask you this daily!</div>
+      </div>
+    </div>
+  </div>
+  <div class="door right-door">
+    <div class="door-content">
+      <div class="text-3xl mb-6 desi-gradient">Our Indian Vision</div>
+      <p class="max-w-md mx-auto opacity-90">Building AI that understands <span class="font-bold">Hindi, Tamil, Punjabi</span> and 20+ Indian languages</p>
+      <div class="mt-8 flex justify-center">
+        <div class="flex space-x-4">
+          <div class="w-12 h-12 rounded-full bg-gradient-to-br from-yellow-500 to-orange-500 flex items-center justify-center hover-scale">
+            <span class="text-xl">🇮🇳</span>
+          </div>
+          <div class="w-12 h-12 rounded-full bg-gradient-to-br from-blue-500 to-green-500 flex items-center justify-center hover-scale">
+            <span class="text-xl">💬</span>
+          </div>
+          <div class="w-12 h-12 rounded-full bg-gradient-to-br from-pink-500 to-purple-500 flex items-center justify-center hover-scale">
+            <span class="text-xl">🤖</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="content-container">
+    <!-- Marquee -->
+    <div class="marquee bg-black py-4">
+      <div class="marquee-content">
+        <div class="marquee-item"><span class="marquee-emoji">🤖</span> AI that understands Indian emotions</div>
+        <div class="marquee-item"><span class="marquee-emoji">🇮🇳</span> Available in Hindi, Tamil, Telugu, Punjabi & more</div>
+        <div class="marquee-item"><span class="marquee-emoji">💬</span> Chai pe charcha with your AI companion</div>
+        <div class="marquee-item"><span class="marquee-emoji">🎶</span> Recommend Bollywood songs based on your mood</div>
+        <div class="marquee-item"><span class="marquee-emoji">📱</span> Perfect for Gen-Z Indians</div>
+        <div class="marquee-item"><span class="marquee-emoji">🤖</span> AI that understands Indian emotions</div>
+        <div class="marquee-item"><span class="marquee-emoji">🇮🇳</span> Available in Hindi, Tamil, Telugu, Punjabi & more</div>
+        <div class="marquee-item"><span class="marquee-emoji">💬</span> Chai pe charcha with your AI companion</div>
+      </div>
+    </div>
+    
+    <!-- Hero -->
+    <section class="min-h-screen flex items-center justify-center relative overflow-hidden bollywood-bg">
+      <div id="hero-3d" class="absolute inset-0"></div>
+      <div class="container mx-auto px-6 relative z-10 text-center pt-32 doors-content">
+        <h1 class="text-6xl md:text-8xl font-bold mb-6"><span class="text-gradient">AI Companions</span> <span class="hindi-text">इंडिया</span></h1>
+        <p class="text-xl md:text-2xl max-w-3xl mx-auto opacity-90 mb-8">AI that gets your <span class="font-bold desi-gradient">Indian vibes</span> and speaks your language</p>
+        <div class="flex justify-center space-x-4 mb-12">
+          <div class="px-6 py-3 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full font-bold hover-scale">Try Free</div>
+          <div class="px-6 py-3 border border-white rounded-full font-bold hover-scale">See Models</div>
+        </div>
+        <div class="max-w-2xl mx-auto glass-card p-6">
+          <p class="mb-4">"Mera AI dost mujhe samajhta hai!" <span class="text-yellow-300">- Riya, 19</span></p>
+          <p>"My AI suggested perfect Bollywood songs when I was feeling low ❤️" <span class="text-yellow-300">- Arjun</span></p>
+        </div>
+      </div>
+      <div class="scroll-hint text-2xl">
+        <i class="fas fa-chevron-down"></i>
+      </div>
+    </section>
+
+    <!-- About -->
+    <section class="min-h-screen py-20 relative">
+      <div class="absolute inset-0 bg-black opacity-70"></div>
+      <div class="container mx-auto px-6 relative z-10 doors-content">
+        <div class="text-center mb-16">
+          <h2 class="text-5xl font-bold mb-4 text-gradient">Humara Mission</h2>
+          <p class="text-xl opacity-90">Building AI for 1.4 billion Indians</p>
+        </div>
+        
+        <div class="flex flex-col lg:flex-row items-center">
+          <div class="lg:w-1/2 mb-16 lg:mb-0 lg:pr-16">
+            <div class="glass-card p-8 rounded-3xl">
+              <h2 class="text-4xl font-bold mb-6">Our Indian Story</h2>
+              <p class="text-lg opacity-90 mb-6">we're making AI that truly understands Indian culture, emotions, and languages.</p>
+              <p class="text-lg opacity-90 mb-8">Our team includes linguists, psychologists, and Bollywood fans who ensure our AI gets your vibe.</p>
+              <div class="flex space-x-4">
+                <div class="w-16 h-16 rounded-full bg-gradient-to-br from-yellow-400 to-red-500 flex items-center justify-center">
+                  <span class="text-2xl">🇮🇳</span>
+                </div>
+                <div class="w-16 h-16 rounded-full bg-gradient-to-br from-blue-400 to-purple-500 flex items-center justify-center">
+                  <span class="text-2xl">💻</span>
+                </div>
+                <div class="w-16 h-16 rounded-full bg-gradient-to-br from-pink-400 to-orange-500 flex items-center justify-center">
+                  <span class="text-2xl">❤️</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="lg:w-1/2">
+            <div class="glass-card p-8 rounded-3xl">
+              <h3 class="text-2xl font-bold mb-4">Indian Values</h3>
+              <ul class="space-y-4 opacity-90">
+                <li class="flex items-center"><i class="fas fa-language mr-3 text-2xl text-purple-400"></i> <span>20+ Indian languages supported</span></li>
+                <li class="flex items-center"><i class="fas fa-rupee-sign mr-3 text-2xl text-green-400"></i> <span>Affordable for Indian students</span></li>
+                <li class="flex items-center"><i class="fas fa-hands-helping mr-3 text-2xl text-pink-400"></i> <span>Understands family values</span></li>
+                <li class="flex items-center"><i class="fas fa-music mr-3 text-2xl text-yellow-400"></i> <span>Bollywood & regional music expert</span></li>
+              </ul>
+              <div class="mt-8">
+                <div class="chat-bubble">"Aapka din kaisa raha?" - Your AI will ask you this daily!</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Models -->
+    <section id="ai-models" class="min-h-screen py-20 relative overflow-hidden">
+      <div class="absolute inset-0 bg-gradient-to-br from-purple-900 to-pink-900 opacity-90"></div>
+      <div class="container mx-auto px-6 relative z-10 doors-content">
+        <div class="text-center mb-20">
+          <h2 class="text-5xl font-bold mb-6 desi-gradient">Our Desi AI Models</h2>
+          <p class="text-xl max-w-3xl mx-auto opacity-90">Choose your perfect digital dost <span class="emoji-float">🤝</span></p>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <!-- Priya -->
+          <div class="model-card glass-card rounded-3xl overflow-hidden h-full">
+            <div class="model-img-container h-72 relative">
+              <div class="model-badge glow">Most Popular</div>
+              <img src="https://videos.openai.com/vg-assets/assets%2Ftask_01jsjy1nj2fd98sngqnzd7xxy8%2Fimg_0.webp?st=2025-05-10T18%3A17%3A41Z&se=2025-05-16T19%3A17%3A41Z&sks=b&skt=2025-05-10T18%3A17%3A41Z&ske=2025-05-16T19%3A17%3A41Z&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skoid=aa5ddad1-c91a-4f0a-9aca-e20682cc8969&skv=2019-02-02&sv=2018-11-09&sr=b&sp=r&spr=https%2Chttp&sig=JykIsirHrjenryX8tN6w1%2B3S8vaoBSWRsWIElyXiGF4%3D&az=oaivgprodscus" alt="Priya" class="w-full h-full object-cover model-img">
+            </div>
+            <div class="p-6">
+              <h3 class="text-2xl font-bold mb-2">Priya <span class="text-sm font-normal">(प्रिया)</span></h3>
+              <p class="opacity-80 mb-4">Your caring Hindi-speaking companion. Perfect for emotional support.</p>
+              <div class="flex items-center text-sm">
+                <span class="mr-2">Speaks:</span>
+                <span class="px-2 py-1 bg-purple-500 rounded-full text-xs mr-1">Hindi</span>
+                <span class="px-2 py-1 bg-pink-500 rounded-full text-xs">English</span>
+              </div>
+            </div>
+          </div>
+          <!-- Arjun -->
+          <div class="model-card glass-card rounded-3xl overflow-hidden h-full">
+            <div class="model-img-container h-72 relative">
+              <div class="model-badge glow">New Release</div>
+              <img src="https://videos.openai.com/vg-assets/assets%2Ftask_01jtxwd2b5f4597ccd4dvnmp81%2F1746907140_img_0.webp?st=2025-05-10T18%3A15%3A12Z&se=2025-05-16T19%3A15%3A12Z&sks=b&skt=2025-05-10T18%3A15%3A12Z&ske=2025-05-16T19%3A15%3A12Z&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skoid=aa5ddad1-c91a-4f0a-9aca-e20682cc8969&skv=2019-02-02&sv=2018-11-09&sr=b&sp=r&spr=https%2Chttp&sig=RPLLhy6Ye9HhUYX2VqZ35UFOjsqGlO2KKd4ezta6%2F3w%3D&az=oaivgprodscus" alt="Arjun" class="w-full h-full object-cover model-img">
+            </div>
+            <div class="p-6">
+              <h3 class="text-2xl font-bold mb-2">Arjun <span class="text-sm font-normal">(अर्जुन)</span></h3>
+              <p class="opacity-80 mb-4">Career mentor who understands Indian job market.</p>
+              <div class="flex items-center text-sm">
+                <span class="mr-2">Speaks:</span>
+                <span class="px-2 py-1 bg-blue-500 rounded-full text-xs mr-1">Hindi</span>
+                <span class="px-2 py-1 bg-green-500 rounded-full text-xs mr-1">Tamil</span>
+                <span class="px-2 py-1 bg-yellow-500 rounded-full text-xs">English</span>
+              </div>
+            </div>
+          </div>
+          <!-- Chhaya -->
+          <div class="model-card glass-card rounded-3xl overflow-hidden h-full">
+            <div class="model-img-container h-72 relative">
+              <img src="https://videos.openai.com/vg-assets/assets%2Ftask_01jtxw7jt0f17tk7c7f0xkczec%2F1746907002_img_0.webp?st=2025-05-10T18%3A15%3A11Z&se=2025-05-16T19%3A15%3A11Z&sks=b&skt=2025-05-10T18%3A15%3A11Z&ske=2025-05-16T19%3A15%3A11Z&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skoid=aa5ddad1-c91a-4f0a-9aca-e20682cc8969&skv=2019-02-02&sv=2018-11-09&sr=b&sp=r&spr=https%2Chttp&sig=RYgfShF1BqX1BpE2pwmJ42jL%2BYIdIaN0Q%2Fpvql48WgA%3D&az=oaivgprodscus" alt="Chhaya" class="w-full h-full object-cover model-img">
+            </div>
+            <div class="p-6">
+              <h3 class="text-2xl font-bold mb-2">Chhaya <span class="text-sm font-normal">(छाया)</span></h3>
+              <p class="opacity-80 mb-4">Your fun, supportive best friend AI with Bollywood knowledge.</p>
+              <div class="flex items-center text-sm">
+                <span class="mr-2">Speaks:</span>
+                <span class="px-2 py-1 bg-pink-500 rounded-full text-xs mr-1">Hindi</span>
+                <span class="px-2 py-1 bg-orange-500 rounded-full text-xs">Punjabi</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="mt-16 text-center">
+          <h3 class="text-3xl font-bold mb-6">Regional Models Coming Soon!</h3>
+          <div class="flex flex-wrap justify-center gap-4">
+            <div class="px-4 py-2 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full">Tamil</div>
+            <div class="px-4 py-2 bg-gradient-to-r from-blue-500 to-green-500 rounded-full">Telugu</div>
+            <div class="px-4 py-2 bg-gradient-to-r from-yellow-500 to-orange-500 rounded-full">Punjabi</div>
+            <div class="px-4 py-2 bg-gradient-to-r from-red-500 to-purple-500 rounded-full">Bengali</div>
+            <div class="px-4 py-2 bg-gradient-to-r from-green-500 to-blue-500 rounded-full">Marathi</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Testimonials -->
+    <section class="py-20 relative overflow-hidden">
+      <div class="absolute inset-0 bg-gradient-to-br from-blue-900 to-purple-900 opacity-90"></div>
+      <div class="container mx-auto px-6 relative z-10">
+        <div class="text-center mb-16">
+          <h2 class="text-5xl font-bold mb-4 text-gradient">What Young India Says</h2>
+          <p class="text-xl opacity-90">Gen-Z approved AI companions</p>
+        </div>
+        
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <div class="glass-card p-8 rounded-3xl testimonial-card">
+            <div class="flex items-center mb-4">
+              <div class="w-12 h-12 rounded-full bg-gradient-to-br from-pink-500 to-purple-500 flex items-center justify-center mr-4">
+                <span class="text-xl">👩</span>
+              </div>
+              <div>
+                <h4 class="font-bold">Riya, 19</h4>
+                <p class="text-sm opacity-70">Delhi University</p>
+              </div>
+            </div>
+            <p class="opacity-90">"Priya understands when I'm stressed about exams and suggests perfect Bollywood songs to relax!"</p>
+          </div>
+          
+          <div class="glass-card p-8 rounded-3xl testimonial-card">
+            <div class="flex items-center mb-4">
+              <div class="w-12 h-12 rounded-full bg-gradient-to-br from-blue-500 to-green-500 flex items-center justify-center mr-4">
+                <span class="text-xl">👨</span>
+              </div>
+              <div>
+                <h4 class="font-bold">Arjun, 22</h4>
+                <p class="text-sm opacity-70">IIT Bombay</p>
+              </div>
+            </div>
+            <p class="opacity-90">"Arjun AI helped me prepare for campus placements in Hindi. Got 3 offers!"</p>
+          </div>
+          
+          <div class="glass-card p-8 rounded-3xl testimonial-card">
+            <div class="flex items-center mb-4">
+              <div class="w-12 h-12 rounded-full bg-gradient-to-br from-yellow-500 to-orange-500 flex items-center justify-center mr-4">
+                <span class="text-xl">👩</span>
+              </div>
+              <div>
+                <h4 class="font-bold">Ayesha, 20</h4>
+                <p class="text-sm opacity-70">Chennai</p>
+              </div>
+            </div>
+            <p class="opacity-90">"Finally an AI that understands Tamil movie references! Feels like talking to a real friend."</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Stats -->
+    <section class="py-20 relative overflow-hidden">
+      <div class="absolute inset-0 bg-gradient-to-br from-purple-900 to-pink-900 opacity-90"></div>
+      <div class="container mx-auto px-6 relative z-10">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
+          <div class="glass-card p-8 rounded-3xl">
+            <div class="text-6xl font-bold mb-4 text-gradient">5M+</div>
+            <p>Indian Users</p>
+            <p class="text-sm opacity-70 mt-2">From Kashmir to Kanyakumari</p>
+          </div>
+          <div class="glass-card p-8 rounded-3xl">
+            <div class="text-6xl font-bold mb-4 text-gradient">95%</div>
+            <p>Hindi Understanding</p>
+            <p class="text-sm opacity-70 mt-2">Including slang and gaali-free jokes</p>
+          </div>
+          <div class="glass-card p-8 rounded-3xl">
+            <div class="text-6xl font-bold mb-4 text-gradient">₹99</div>
+            <p>Starting Price</p>
+            <p class="text-sm opacity-70 mt-2">Affordable for Indian students</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- CTA -->
+    <section class="py-20 relative overflow-hidden">
+      <div class="absolute inset-0 bg-gradient-to-br from-blue-900 to-purple-900 opacity-90"></div>
+      <div class="container mx-auto px-6 relative z-10 text-center">
+        <h2 class="text-5xl font-bold mb-8 text-gradient">Ready to Meet Your AI Dost?</h2>
+        <p class="text-xl max-w-2xl mx-auto mb-12">Join millions of young Indians who've found their perfect digital companion</p>
+        <div class="flex flex-col sm:flex-row justify-center gap-4">
+          <button class="px-8 py-4 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full font-bold text-lg hover-scale">Try Free for 7 Days</button>
+          <button class="px-8 py-4 border-2 border-white rounded-full font-bold text-lg hover-scale">See All Models</button>
+        </div>
+        <div class="mt-8 text-sm opacity-80">
+          <p>No credit card required • Cancel anytime</p>
+          <p class="mt-2">Starting at just ₹99/month after trial</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="py-12 relative overflow-hidden">
+      <div class="absolute inset-0 bg-black opacity-90"></div>
+      <div class="container mx-auto px-6 relative z-10">
+        <div class="flex flex-col md:flex-row justify-between items-center">
+          <div class="mb-6 md:mb-0">
+            <div class="text-3xl font-bold text-gradient mb-2">AI Companions</div>
+            <p class="opacity-80">Made with ❤️ in India</p>
+          </div>
+          <div class="flex space-x-6">
+            <a href="#" class="text-2xl hover:text-pink-400 transition"><i class="fab fa-instagram"></i></a>
+            <a href="#" class="text-2xl hover:text-blue-400 transition"><i class="fab fa-twitter"></i></a>
+            <a href="#" class="text-2xl hover:text-red-500 transition"><i class="fab fa-youtube"></i></a>
+            <a href="#" class="text-2xl hover:text-green-500 transition"><i class="fab fa-whatsapp"></i></a>
+          </div>
+        </div>
+        <div class="border-t border-gray-800 mt-8 pt-8 text-center opacity-70">
+          © 2023 AI Companions India. All rights reserved.
+        </div>
+      </div>
+    </footer>
+  </div>
+
+  <script>
+    function init3DScene() {
+      const container = document.getElementById('hero-3d');
+      if (!container) return;
+      const scene = new THREE.Scene();
+      const camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000);
+      const renderer = new THREE.WebGLRenderer({ alpha:true, antialias:true });
+      renderer.setSize(window.innerWidth, window.innerHeight);
+      container.appendChild(renderer.domElement);
+      const geometry = new THREE.IcosahedronGeometry(0.5,0);
+      const material = new THREE.MeshPhongMaterial({ 
+        color:0x8a2be2, 
+        emissive:0xff3fa4, 
+        transparent:true, 
+        opacity:0.9,
+        shininess: 100
+      });
+      const companion = new THREE.Mesh(geometry, material);
+      scene.add(companion);
+      scene.add(new THREE.AmbientLight(0x404040));
+      const light = new THREE.DirectionalLight(0xffffff,0.8);
+      light.position.set(1,1,1); scene.add(light);
+      const pointLight = new THREE.PointLight(0xff3fa4, 0.5);
+      pointLight.position.set(2,2,2); scene.add(pointLight);
+      camera.position.z = 3;
+      function animate() { 
+        requestAnimationFrame(animate); 
+        companion.rotation.x +=0.005; 
+        companion.rotation.y +=0.005; 
+        renderer.render(scene,camera); 
+      }
+      animate();
+      window.addEventListener('resize', ()=>{
+        camera.aspect=window.innerWidth/window.innerHeight; 
+        camera.updateProjectionMatrix(); 
+        renderer.setSize(window.innerWidth,window.innerHeight); 
+      });
+    }
+    
+    function openDoors() {
+      document.body.classList.add('doors-open');
+      gsap.to('.doors-content',{ opacity:1,duration:1,delay:1.2,ease:'power2.out'});
+    }
+    
+    function initCursor() {
+      const cursor = document.querySelector('.custom-cursor');
+      if (!cursor) return;
+      
+      cursor.style.opacity = 1;
+      
+      // Track mouse movement
+      window.addEventListener('mousemove', e => {
+        cursor.style.left = e.clientX + 'px';
+        cursor.style.top = e.clientY + 'px';
+      });
+      
+      // Scale effect on hover
+      const hoverElements = document.querySelectorAll('a, button, .hover-scale, .model-card');
+      hoverElements.forEach(el => {
+        el.addEventListener('mouseenter', () => {
+          cursor.classList.add('cursor-scale');
+        });
+        el.addEventListener('mouseleave', () => {
+          cursor.classList.remove('cursor-scale');
+        });
+      });
+    }
+    
+    function initLanguageSwitch() {
+      const switchBtn = document.getElementById('languageSwitch');
+      const languageText = document.getElementById('languageText');
+      let isHindi = true;
+      
+      if (!switchBtn || !languageText) return;
+      
+      switchBtn.addEventListener('click', () => {
+        isHindi = !isHindi;
+        if (isHindi) {
+          languageText.textContent = 'हिंदी';
+          switchBtn.classList.add('hindi-active');
+          // Here you would implement actual language switching
+        } else {
+          languageText.textContent = 'English';
+          switchBtn.classList.remove('hindi-active');
+        }
+      });
+    }
+    
+    function initMarquee() {
+      const marqueeContent = document.querySelector('.marquee-content');
+      if (!marqueeContent) return;
+      
+      // Duplicate content for seamless looping
+      marqueeContent.innerHTML += marqueeContent.innerHTML;
+    }
+    
+    document.addEventListener('DOMContentLoaded',()=>{
+      init3DScene();
+      setTimeout(openDoors,1000);
+      gsap.registerPlugin(ScrollTrigger);
+      
+      // Animate glass cards
+      gsap.utils.toArray('.glass-card').forEach((card,i)=>{
+        gsap.from(card,{ 
+          scrollTrigger:{
+            trigger:card,
+            start:'top 80%'
+          },
+          y:50,
+          opacity:0,
+          duration:0.8,
+          delay:i*0.1,
+          ease:'back.out(1)'
+        });
+      });
+      
+      // Animate hero text
+      gsap.from('.hero-gradient', {
+        scrollTrigger: {
+          trigger: '.hero-gradient',
+          start: 'top center',
+          scrub: true
+        },
+        backgroundPosition: '0% 0%'
+      });
+      
+      initCursor();
+      initLanguageSwitch();
+      initMarquee();
+    });
+  </script>
+</body>
+</html>
